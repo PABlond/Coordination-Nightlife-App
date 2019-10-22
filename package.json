@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "tsc": "tsc -w",
+    "dev": "ts-node-dev --respawn --transpileOnly src",
+    "prod": "tsc && node ./build/",
+    "test": "jest --watchAll"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.1",
+    "@types/jest": "^24.0.19",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "google-images": "^2.1.0",
+    "jest": "^24.9.0",
+    "mongoose": "^5.7.6",
+    "supertest": "^4.0.2",
+    "ts-jest": "^24.1.0",
+    "ts-node-dev": "^1.0.0-pre.43",
+    "typescript": "^3.6.4"
+  }
+}
