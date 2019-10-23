@@ -6,6 +6,7 @@ import {
 import { ISearch } from "./../interfaces/model.interface"
 import Search from "./../models/search"
 
+require("dotenv").config()
 const { GOOGLE_IMAGE_APIKEY, GOOGLE_IMAGE_CX } = process.env
 
 export default class ImgSearch {
