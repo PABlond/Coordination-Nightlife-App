@@ -1,4 +1,4 @@
-import ImgSearch from "../../src/controllers/imgSearch"
+import ImgSearch from "../../controllers/imgSearch"
 import mongoose from "mongoose"
 
 const imgSearch = new ImgSearch()
@@ -31,7 +31,9 @@ describe("Test getLastSearch", () => {
 
 describe("Test organizeLastSearch", () => {
   test("It should return an array", async () => {
-    const response = imgSearch.organizeLastSearch([{_id: "aSampleId", term: "term", when: new Date()}])
+    const response = imgSearch.organizeLastSearch([
+      { _id: "aSampleId", term: "term", when: new Date() }
+    ])
     expect(Object.keys(response[0])).toEqual(
       expect.arrayContaining(["term", "when"])
     )
