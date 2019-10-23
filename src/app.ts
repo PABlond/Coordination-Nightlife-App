@@ -1,6 +1,13 @@
 import express from "express"
-import Router from './routes'
+import mongoose from "mongoose"
+import Router from "./routes"
+
 require("dotenv").config()
+
+const { MONGO_PASSWORD, MONGO_USER, MONGO_DB } = process.env
+mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_DB}`, {
+  useNewUrlParser: true
+})
 
 const app = express()
 
