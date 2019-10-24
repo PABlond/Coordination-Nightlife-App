@@ -9,7 +9,9 @@ const auth = new Auth()
 const businesses = new Businesses()
 
 Router.post("/github-cb", async (req, res) => {
-  return res.status(201).json(await auth.githubAuth(req.body.code))
+  const response = await auth.githubAuth(req.body.code).catch(err => ({ err }))
+  console.log("resp", response)
+  return res.status(response.err ? 401 : 201).json(response)
 })
 
 Router.post("/search", async (req, res) => {
@@ -20,7 +22,7 @@ Router.post("/search", async (req, res) => {
 
 Router.post("/business", async (req, res) => {
   const { id } = req.body
-
+  console.log(id)
   return res.status(201).json(await businesses.getBusiness(req.body))
 })
 
