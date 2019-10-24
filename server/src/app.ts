@@ -3,8 +3,8 @@ import mongoose from "mongoose"
 import Router from "./routes"
 import path from "path"
 import bodyParser from 'body-parser'
-
 require("dotenv").config()
+
 const { MONGO_PASSWORD, MONGO_USER, MONGO_DB } = process.env
 
 mongoose.connect(
