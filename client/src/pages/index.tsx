@@ -1,16 +1,39 @@
 import React, { useState } from "react"
 import styled from "styled-components"
+import axios from "axios"
+import "bootstrap/dist/css/bootstrap.min.css"
+import "./../assets/scss/style.scss"
 
 import { H1, H3 } from "./../components/Styled/Headings"
-import { Container, Form } from "react-bootstrap"
+import { Container, Form, Col, Row } from "react-bootstrap"
 import { FaArrowAltCircleRight } from "react-icons/fa"
 import Nav from "./../components/Nav"
+import ModalBars from "./../components/Modals/Bars"
 
 export default () => {
-  const [search, setSearch] = useState<string>("")
+  const initialModalData = {
+    show: false,
+    id: "",
+  }
+  const [city, setCity] = useState<string>("")
+  const [bars, setBars] = useState<[]>([])
+  const [modalData, setModalData] = useState<{
+    show: Boolean
+    id: string
+  }>(initialModalData)
 
-  const onSearch = () => {
-    console.log(search)
+  const onSearch = async e => {
+    e.preventDefault()
+    console.log(city)
+    const { data } = await axios.post("http://localhost:3000/api/search", {
+      city,
+    })
+    setBars(data)
+  }
+
+  const openModalBar = (id: string) => {
+    console.log("CLICkED")
+    setModalData({ show: true, id })
   }
 
   return (
@@ -24,17 +47,48 @@ export default () => {
         </CustomHeadings>
       </Container>
       <Content>
-        <CustomForm>
+        <CustomForm onSubmit={onSearch}>
           <FormGroup controlId="formBasicSearch">
             <FormControl
               type="text"
               placeholder="Where are you at ?"
-              value={search}
-              onChange={(e: any) => setSearch(e.target.value)}
+              value={city}
+              onChange={(e: any) => setCity(e.target.value)}
             />
           </FormGroup>
-          <SubmitButton size="2em" onClick={onSearch} />
+          <SubmitButton type="submit">
+            <FaArrowAltCircleRight />
+          </SubmitButton>
         </CustomForm>
+        <Container>
+          <Row>
+            {bars.map(
+              ({
+                id,
+                name,
+                photos: [photo],
+                hours: { is_open_now: isOpen },
+                location: { formatted_address },
+              }: any) => {
+                return (
+                  <Col md={3} key={id} onClick={() => openModalBar(id)}>
+                    <h3>{name}</h3>
+                    <img className="img-fluid" src={photo} />
+                    <p>{isOpen ? "Open" : "Closed"}</p>
+                    <p
+                      dangerouslySetInnerHTML={{ __html: formatted_address }}
+                    ></p>
+                  </Col>
+                )
+              }
+            )}
+          </Row>
+        </Container>
+        <ModalBars
+          show={modalData.show}
+          handleClose={() => setModalData(initialModalData)}
+          id={modalData.id}
+        />
       </Content>
     </>
   )
@@ -64,6 +118,4 @@ const FormControl = styled(Form.Control)`
   margin-right: 10px;
 `
 
-const SubmitButton = styled(FaArrowAltCircleRight)`
-  cursor: pointer;
-`
+const SubmitButton = styled.button``
