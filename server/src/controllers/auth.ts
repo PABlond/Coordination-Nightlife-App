@@ -12,7 +12,7 @@ export default class Auth {
       { code, client_id, client_secret }
     )
     if (tokenStr.split("=").indexOf("access_token") !== -1)
-      return tokenStr.split("=")[1].split('&scope')[0]
+      return tokenStr.split("=")[1].split("&scope")[0]
     else throw new Error("Bad credentials")
   }
 
@@ -23,20 +23,20 @@ export default class Auth {
     return data[0].email as any
   }
 
-  isUserExists = async ({email}: {email: string}) => {
+  isUserExists = async ({ email }: { email: string }) => {
     return !!(await User.findOne({ email }))
   }
 
-  createUser = async ({email}: {email: string}) => {
+  createUser = async ({ email }: { email: string }) => {
     await new User({ email }).save()
   }
 
   githubAuth = async (code: string) => {
     const access_token = await this.reqAccessToken({ code })
     const email = await this.reqEmail({ access_token })
-    if (!this.isUserExists({email})) {
-      await this.createUser({email})
+    if (!this.isUserExists({ email })) {
+      await this.createUser({ email })
     }
-    return access_token
+    return { access_token }
   }
 }
