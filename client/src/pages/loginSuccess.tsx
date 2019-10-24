@@ -1,13 +1,31 @@
 import React, { useEffect } from "react"
 import queryString from "query-string"
+import { navigate } from "gatsby"
 import axios from "axios"
+import Auth from "./../actions/auth"
 
 export default ({ location }) => {
+  const displayError = () => {
+    console.log("ERROR")
+    alert("An error occured")
+    navigate("/")
+  }
+
   const fetchCode = async code => {
-    const { data } = await axios.post("http://localhost:3000/api/github-cb", {
-      code,
-    })
-    console.log("body", data)
+    const {
+      data: { access_token } = { access_token: "" },
+      err,
+    }: any = await axios
+      .post("http://localhost:3000/api/github-cb", {
+        code,
+      })
+      .catch(err => ({ err }))
+    if (!err) {
+      const auth = new Auth()
+      const isTokenStored = auth.setToken(access_token)
+      if (!isTokenStored) return displayError()
+      navigate("/")
+    } else displayError()
   }
 
   useEffect(() => {
@@ -16,5 +34,5 @@ export default ({ location }) => {
     fetchCode(code)
   }, [])
 
-  return <p>login Success</p>
+  return <p>login ...</p>
 }
