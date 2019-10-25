@@ -5,11 +5,26 @@ import {
 } from "./../config/yelpQueries"
 import Auth from "./auth"
 import { IBuisness, ReqReview } from "./../interfaces/query.interface"
+import { IPlace } from "./../interfaces/model.interface"
+import User from "./../models/user"
+
 require("dotenv").config()
 
 export default class Businesses {
   yelp_token = process.env.YELP_TOKEN
   auth = new Auth()
+
+  formatToday() {
+    var d = new Date(),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear()
+
+    if (month.length < 2) month = "0" + month
+    if (day.length < 2) day = "0" + day
+
+    return [year, month, day].join(", ")
+  }
 
   getBusinesses = async ({
     city: location,
@@ -21,11 +36,26 @@ export default class Businesses {
     const {
       data: { businesses }
     } = await getBusinessesQuery({ offset, location })
-    console.log(
-      `https://api.yelp.com/v3/businesses/search?term=bars&location=${location}&offset=${offset}`
-    )
 
+    for await (const business of businesses) {
+      business.going = await this.getOnGoingUser({ id: business.id })
+    }
     return businesses
+  }
+
+  getOnGoingUser = async ({ id }: { id: string }) => {
+    const usersGoing = await User.find({
+      "places.id": id
+    })
+    console.log(usersGoing)
+    return usersGoing.map(({ name, places }: any) => ({
+      name,
+      when: places
+        .map(({ id: businessId, when }: IPlace) =>
+          id === businessId ? when : null
+        )
+        .filter(Boolean)
+    }))
   }
 
   getBusiness = async ({ id }: any) => {
@@ -33,23 +63,28 @@ export default class Businesses {
     const {
       data: { reviews }
     } = await getBusinessReview({ id })
+    console.log(this.formatData({
+      ...data,
+      going: await this.getOnGoingUser({id: data.id}),
+      reviews: this.formatReview(reviews)
+    }))
     return this.formatData({
       ...data,
+      going: await this.getOnGoingUser({id: data.id}),
       reviews: this.formatReview(reviews)
     })
   }
 
   placeEvent = async ({
     id,
-    date,
-    token
+    date: when,
+    email
   }: {
     id: string
     date: string
-    token: string
+    email: string
   }) => {
-    const when = new Date(date)
-    const user: any = await this.auth.getUserWithToken(token as string)
+    const user: any = await this.auth.getUser(email)
     if (user) {
       if (!user.places) user.places = []
       user.places.push({ when, id })
@@ -76,7 +111,8 @@ export default class Businesses {
     photos,
     location: { display_address: address },
     coordinate,
-    reviews
+    reviews,
+    going
   }: IBuisness) => ({
     name,
     photos,
@@ -84,6 +120,7 @@ export default class Businesses {
     phone,
     address,
     coordinate,
-    reviews
+    reviews,
+    going
   })
 }
