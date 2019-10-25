@@ -6,7 +6,7 @@ export default mongoose.model(
     email: String,
     places: [
       {
-        id: String,
+        place_id: String,
         when: String
       }
     ]
