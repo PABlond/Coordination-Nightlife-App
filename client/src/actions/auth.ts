@@ -8,4 +8,11 @@ export default class Auth {
   }
 
   isWindow = () => !!window
+
+  isLogged = () => {
+    if (this.isWindow) {
+      return !!window.localStorage.getItem('nightlife')
+    }
+    return false
+  }
 }

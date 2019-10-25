@@ -4,6 +4,7 @@ import styled from "styled-components"
 import { navigate } from "gatsby"
 import queryString from "query-string"
 import colors from "./../../config/colors"
+import Auth from "./../../actions/auth"
 
 import { Container, Row, Col, Modal, Carousel, Button } from "react-bootstrap"
 import DatePicker from "react-datepicker"
@@ -90,24 +91,33 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
                 </DescriptionLine>
               )}
               <DescriptionLine>
-                Address: : {data.address.join(" ")}
+                Address: : {data.address.join(" ") || "No Data"}
               </DescriptionLine>
-              <DescriptionLine>Phone : {data.phone}</DescriptionLine>
+              <DescriptionLine>Phone : {data.phone || "No Data"}</DescriptionLine>
             </DescriptionContainer>
             <DescriptionContainer>
-              <DatePicker
-                selected={startDate}
-                onChange={date => setStartDate(date)}
-                minDate={new Date()}
-                placeholderText="Select a date"
-              />
-              <Button variant="primary" onClick={placeEvent}>
-                I'll go there
-              </Button>
+              {new Auth().isLogged() ? (
+                <>
+                  {" "}
+                  <DatePicker
+                    selected={startDate}
+                    onChange={date => setStartDate(date)}
+                    minDate={new Date()}
+                    placeholderText="Select a date"
+                  />
+                  <Button variant="primary" onClick={placeEvent}>
+                    I'll go there
+                  </Button>
+                </>
+              ) : (
+                <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=4e78567ab3cf78bb6571">
+                  Please log in to tell the world you will be there
+                </a>
+              )}
             </DescriptionContainer>
             <InitialContainer>
-              {data.going.map(user => (
-                <InitialLetter>
+              {data.going.map((user: any, i: number) => (
+                <InitialLetter key={i}>
                   {user.name
                     .split(" ")
                     .map(word => word[0])

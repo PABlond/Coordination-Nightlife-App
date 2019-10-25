@@ -117,6 +117,7 @@ export default ({ data, location }) => {
                 name,
                 image_url: photo,
                 is_closed,
+                phone,
                 location: { address1, address2, city },
                 going,
               }: any) => {
@@ -141,9 +142,16 @@ export default ({ data, location }) => {
                         <b>Address</b> : {address1 || address2} {city}
                       </DescriptionLine>
                       <DescriptionLine>
-                        {going.length > 0
-                          ? `${going.length} people plan to go there`
-                          : "Nobody plans to go there"}
+                        <b>Phone</b> : {phone}
+                      </DescriptionLine>
+                      <DescriptionLine>
+                        {going.length > 0 ? (
+                          <>
+                            <b>{going.length} people</b> will be there`
+                          </>
+                        ) : (
+                          "Nobody is interested"
+                        )}
                       </DescriptionLine>
                     </DescriptionContainer>
                   </Col>
