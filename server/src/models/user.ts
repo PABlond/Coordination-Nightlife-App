@@ -4,9 +4,10 @@ export default mongoose.model(
   "user",
   new mongoose.Schema({
     email: String,
+    name: String,
     places: [
       {
-        place_id: String,
+        id: String,
         when: String
       }
     ]
