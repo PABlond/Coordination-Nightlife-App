@@ -1,8 +1,10 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import styled from "styled-components"
 import axios from "axios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./../assets/scss/style.scss"
+import queryString from "query-string"
+import { navigate } from "gatsby"
 
 import { H1, H3 } from "./../components/Styled/Headings"
 import { Container, Form, Col, Row } from "react-bootstrap"
@@ -10,32 +12,54 @@ import { FaArrowAltCircleRight } from "react-icons/fa"
 import Nav from "./../components/Nav"
 import ModalBars from "./../components/Modals/Bars"
 
-export default () => {
+export default ({ location }) => {
   const initialModalData = {
     show: false,
     id: "",
   }
-  const [city, setCity] = useState<string>("")
+  const [isLoading, setLoading] = useState<Boolean>(true)
+  const [search, setCity] = useState<string>("")
   const [bars, setBars] = useState<[]>([])
   const [modalData, setModalData] = useState<{
     show: Boolean
     id: string
   }>(initialModalData)
 
-  const onSearch = async e => {
-    e.preventDefault()
-    console.log(city)
+  const query = queryString.parse(location.search)
+  const onSearch = async () => {
+    console.log(query.location)
     const { data } = await axios.post("http://localhost:3000/api/search", {
-      city,
+      city: query.location,
     })
     setBars(data)
+    setLoading(false)
   }
 
   const openModalBar = (id: string) => {
-    console.log("CLICkED")
     setModalData({ show: true, id })
   }
 
+  const navigateTo = (path, e) => {
+    if (e) e.preventDefault()
+    navigate(path)
+
+    setLoading(true)
+  }
+
+  useEffect(() => {
+    if (query.loading === "true" && isLoading) {
+      if (query.search === "true") {
+        setLoading(false)
+        onSearch()
+      }
+      if (query.location) {
+        setLoading(false)
+        setCity(query.location as string)
+      }
+    }
+  }, [location])
+
+  // if (bars.length) console.log(bars[0].name)
   return (
     <>
       <Nav />
@@ -47,12 +71,16 @@ export default () => {
         </CustomHeadings>
       </Container>
       <Content>
-        <CustomForm onSubmit={onSearch}>
+        <CustomForm
+          onSubmit={(e: any) =>
+            navigateTo(`/?loading=true&search=true&location=${search}`, e)
+          }
+        >
           <FormGroup controlId="formBasicSearch">
             <FormControl
               type="text"
               placeholder="Where are you at ?"
-              value={city}
+              value={search}
               onChange={(e: any) => setCity(e.target.value)}
             />
           </FormGroup>
@@ -72,9 +100,15 @@ export default () => {
               }: any) => {
                 return (
                   <Col md={3} key={id} onClick={() => openModalBar(id)}>
-                    <h3>{name}</h3>
+                    <CardTitle>{name}</CardTitle>
                     <img className="img-fluid" src={photo} />
-                    <p>{isOpen ? "Open" : "Closed"}</p>
+                    <p>
+                      {isOpen ? (
+                        <p className="text-info">"Open"</p>
+                      ) : (
+                        <p className="text-danger">Closed</p>
+                      )}
+                    </p>
                     <p
                       dangerouslySetInnerHTML={{ __html: formatted_address }}
                     ></p>
@@ -116,6 +150,9 @@ const FormControl = styled(Form.Control)`
   width: 100%;
   height: 30px;
   margin-right: 10px;
+`
+const CardTitle = styled.h3`
+  text-align: center;
 `
 
 const SubmitButton = styled.button``
