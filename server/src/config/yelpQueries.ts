@@ -1,32 +1,24 @@
-import gql from "graphql-tag"
+import axios from "axios"
 
-export const searchBusinesses = gql`
-  query SearchBusinesses($location: String) {
-    search(term: "bars", location: $location, limit: 12) {
-      business {
-        id
-        name
-        photos
-        location {
-          address1
-          postal_code
-          city
-          formatted_address
-        }
-        hours {
-          # open {
-          #   is_overnight
-          #   end
-          #   start
-          #   day
-          # }
-          is_open_now
-        }
-        coordinates {
-          latitude
-          longitude
-        }
-      }
-    }
-  }
-`
+require("dotenv").config()
+
+const { YELP_TOKEN: yelp_token } = process.env
+const headers = { Authorization: yelp_token }
+
+export const getBusinessesQuery = async ({
+  offset = 1,
+  location
+}: {
+  offset: Number
+  location: string
+}) =>
+  axios.get(
+    `https://api.yelp.com/v3/businesses/search?term=bars&location=${location}&limit=12&offset=${offset}`,
+    { headers }
+  )
+
+export const getBusinessQuery = ({ id }: { id: string }) =>
+  axios.get(`https://api.yelp.com/v3/businesses/${id}`, { headers })
+
+export const getBusinessReview = ({ id }: { id: string }) =>
+  axios.get(`https://api.yelp.com/v3/businesses/${id}/reviews`, { headers })
