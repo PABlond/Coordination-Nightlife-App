@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
 import styled from "styled-components"
+import { navigate } from "gatsby"
+import queryString from "query-string"
+import colors from "./../../config/colors"
 
-import { Container, Row, Col, Modal, Button, Carousel } from "react-bootstrap"
+import { Container, Row, Col, Modal, Carousel, Button } from "react-bootstrap"
+import DatePicker from "react-datepicker"
 
-export default ({ show, handleClose, id }) => {
+export default ({ show, handleClose, id, query, mainLoading }) => {
   const [loading, setLoading] = useState<Boolean>(true)
   const [data, setData] = useState({})
+  const [startDate, setStartDate] = useState(null)
 
   const fetchData = async () => {
     const { data: barInfo } = await axios.post(
@@ -15,6 +20,7 @@ export default ({ show, handleClose, id }) => {
         id,
       }
     )
+    console.log(barInfo)
     setData(barInfo)
     setLoading(false)
   }
@@ -75,14 +81,40 @@ export default ({ show, handleClose, id }) => {
                 </Carousel.Item>
               ))}
             </Carousel>
-
-            {data.isOpen ? (
-              <p className="text-info">"Open"</p>
-            ) : (
-              <p className="text-danger">Closed</p>
-            )}
-            <p>{data.phone}</p>
-            <p>{data.address.join(" ")}</p>
+            <DescriptionContainer>
+              {!data.is_closed ? (
+                <DescriptionLine className="text-info">Open</DescriptionLine>
+              ) : (
+                <DescriptionLine className="text-danger">
+                  Closed
+                </DescriptionLine>
+              )}
+              <DescriptionLine>
+                Address: : {data.address.join(" ")}
+              </DescriptionLine>
+              <DescriptionLine>Phone : {data.phone}</DescriptionLine>
+            </DescriptionContainer>
+            <DescriptionContainer>
+              <DatePicker
+                selected={startDate}
+                onChange={date => setStartDate(date)}
+                minDate={new Date()}
+                placeholderText="Select a date"
+              />
+              <Button variant="primary" onClick={placeEvent}>
+                I'll go there
+              </Button>
+            </DescriptionContainer>
+            <InitialContainer>
+              {data.going.map(user => (
+                <InitialLetter>
+                  {user.name
+                    .split(" ")
+                    .map(word => word[0])
+                    .join("")}
+                </InitialLetter>
+              ))}
+            </InitialContainer>
             {data.reviews.map((review: any, i: number) => (
               <ReviewContainer key={i}>
                 <ReviewHeader>
@@ -124,6 +156,15 @@ export default ({ show, handleClose, id }) => {
 const ModalTitle = styled(Modal.Title)`
   text-align: center;
   width: 100%;
+  color: ${colors.main};
+`
+
+const DescriptionContainer = styled.div`
+  margin-bottom: 1rem;
+`
+
+const DescriptionLine = styled.p`
+  margin-bottom: 0 !important;
 `
 
 const ImgBusiness = styled.img`
@@ -138,6 +179,17 @@ const ReviewContainer = styled(Container)`
   border: 1px solid black;
   padding: 1rem;
   margin-bottom: 2rem;
+`
+const InitialContainer = styled.div`
+  display: flex;
+`
+
+const InitialLetter = styled.p`
+  background-color: ${colors.main};
+  padding: 10px;
+  border-radius: 50%;
+  font-weight: 600;
+  color: #fff;
 `
 
 const ReviewHeader = styled(Row)`
