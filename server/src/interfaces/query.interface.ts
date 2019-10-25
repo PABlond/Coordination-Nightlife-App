@@ -6,8 +6,7 @@ export interface ReqReview {
   rating: Number
   text: string
   time_created: string
-  user: { image_url: string 
-    name: string }
+  user: { image_url: string; name: string }
 }
 
 export interface Review {
@@ -15,6 +14,11 @@ export interface Review {
   rating: Number
   text: string
   time_created: string
+}
+
+interface OnGoing {
+  name: string
+  when: string
 }
 
 export interface IBuisness {
@@ -30,4 +34,5 @@ export interface IBuisness {
     longitude: Number
   }
   reviews: Review[]
+  going: OnGoing[]
 }
