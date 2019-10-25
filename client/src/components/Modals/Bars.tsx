@@ -2,20 +2,11 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import styled from "styled-components"
 
-import { Modal, Button, Carousel } from "react-bootstrap"
+import { Container, Row, Col, Modal, Button, Carousel } from "react-bootstrap"
 
 export default ({ show, handleClose, id }) => {
   const [loading, setLoading] = useState<Boolean>(true)
   const [data, setData] = useState({})
-
-  const formatData = ({
-    name,
-    rating,
-    hours: [{ is_open_now: isOpen }, _],
-    image_url: photo,
-  }) => {
-    return { name, isOpen, photo, rating }
-  }
 
   const fetchData = async () => {
     const { data: barInfo } = await axios.post(
@@ -24,29 +15,33 @@ export default ({ show, handleClose, id }) => {
         id,
       }
     )
-    console.log(barInfo)
     setData(barInfo)
     setLoading(false)
+  }
+
+  const close = () => {
+    setLoading(true)
+    handleClose()
   }
 
   useEffect(() => {
     if (show) fetchData()
   }, [show])
-  console.log(data.rating)
+
   return (
-    <Modal show={show} onHide={handleClose} animation={false}>
+    <Modal show={show} onHide={close} animation={false}>
       {loading ? (
         <Modal.Body>Loading ... </Modal.Body>
       ) : (
         <>
           <Modal.Header closeButton>
-            <Modal.Title>
+            <ModalTitle>
               {data.name}{" "}
               {data.rating &&
                 Array.from(Array(Math.floor(data.rating)).keys()).map(i => (
                   <span key={i}>*</span>
                 ))}
-            </Modal.Title>
+            </ModalTitle>
           </Modal.Header>
           <Modal.Body>
             <Carousel>
@@ -61,27 +56,42 @@ export default ({ show, handleClose, id }) => {
               ))}
             </Carousel>
 
-            <p>{data.isOpen ? "open" : "closed"}</p>
+            {data.isOpen ? (
+              <p className="text-info">"Open"</p>
+            ) : (
+              <p className="text-danger">Closed</p>
+            )}
             <p>{data.phone}</p>
             <p>{data.address.join(" ")}</p>
             {data.reviews.map((review: any, i: number) => (
-              <div>
-                <UserImgReview className="img-fluid" src={review.image_url} />
-                <p>
-                  {review.name}{" "}
-                  {Array.from(Array(Math.floor(review.rating)).keys()).map(
-                    i => (
-                      <span key={i}>*</span>
-                    )
-                  )}
-                </p>
-                <p>{review.time_created}</p>
+              <ReviewContainer key={i}>
+                <ReviewHeader>
+                  <Col md={4}>
+                    <UserImgReview
+                      className="img-fluid"
+                      src={review.image_url}
+                    />
+                  </Col>
+                  <Col md={8}>
+                    <PMargin0>
+                      {review.name}{" "}
+                      {Array.from(Array(Math.floor(review.rating)).keys()).map(
+                        i => (
+                          <span key={i}>*</span>
+                        )
+                      )}
+                    </PMargin0>
+
+                    <PMargin0>{review.time_created}</PMargin0>
+                  </Col>
+                </ReviewHeader>
+
                 <p>{review.text}</p>
-              </div>
+              </ReviewContainer>
             ))}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" onClick={handleClose}>
+            <Button variant="primary" onClick={close}>
               Close
             </Button>
           </Modal.Footer>
@@ -91,10 +101,30 @@ export default ({ show, handleClose, id }) => {
   )
 }
 
+const ModalTitle = styled(Modal.Title)`
+  text-align: center;
+  width: 100%;
+`
+
 const ImgBusiness = styled.img`
   height: 500px;
 `
 
 const UserImgReview = styled.img`
   max-height: 70px;
+`
+
+const ReviewContainer = styled(Container)`
+  border: 1px solid black;
+  padding: 1rem;
+  margin-bottom: 2rem;
+`
+
+const ReviewHeader = styled(Row)`
+  align-items: center;
+  margin-bottom: 1rem;
+`
+
+const PMargin0 = styled.p`
+  margin-bottom: 0 !important;
 `
