@@ -1,9 +1,15 @@
 import axios from "axios"
 import User from "./../models/user"
+import jwt from "jsonwebtoken"
+
+require("dotenv").config()
+
+const { GITHUB_SECRET, GITHUB_ID, JWT_SECRET } = process.env
 
 export default class Auth {
-  client_secret = "82f573764a1152544d7ab3336809a2e007999103"
-  client_id = "4e78567ab3cf78bb6571"
+  client_secret = GITHUB_SECRET
+  client_id = GITHUB_ID
+  jwt_secret = JWT_SECRET as string
 
   reqAccessToken = async ({ code }: { code: string }) => {
     const { client_id, client_secret } = this
@@ -27,9 +33,19 @@ export default class Auth {
     return !!(await User.findOne({ email }))
   }
 
+  getUserWithToken = async (token: string) => {
+    const { email } = this.decodeToken(token) as { email: string }
+
+    return User.findOne({ email })
+  }
+
   createUser = async ({ email }: { email: string }) => {
     await new User({ email }).save()
   }
+
+  getToken = (email: string) => jwt.sign({ email }, this.jwt_secret)
+
+  decodeToken = (token: string) => jwt.verify(token, this.jwt_secret)
 
   githubAuth = async (code: string) => {
     const access_token = await this.reqAccessToken({ code })
@@ -37,6 +53,7 @@ export default class Auth {
     if (!this.isUserExists({ email })) {
       await this.createUser({ email })
     }
-    return { access_token }
+    const token = this.getToken(email)
+    return { token }
   }
 }
