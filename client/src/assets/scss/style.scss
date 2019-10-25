@@ -1,7 +1,9 @@
-.gatsby-image-wrapper {
-    picture {
-        img {
-            position: inherit!important;
-        }
-    }
+.carousel-inner {
+    background-color: #3c3d47;
+    margin-bottom: 2rem;
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
