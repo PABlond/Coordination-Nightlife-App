@@ -33,9 +33,7 @@ export default class Auth {
     return !!(await User.findOne({ email }))
   }
 
-  getUserWithToken = async (token: string) => {
-    const { email } = this.decodeToken(token) as { email: string }
-
+  getUser = (email: string) => {
     return User.findOne({ email })
   }
 

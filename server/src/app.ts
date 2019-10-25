@@ -1,9 +1,11 @@
 import express from "express"
 import mongoose from "mongoose"
 import Router from "./routes"
-import path from "path"
-import bodyParser from 'body-parser'
+import passport from "passport"
+import bodyParser from "body-parser"
+import jwtStatregy from './config/jwtStatregy'
 require("dotenv").config()
+
 
 const { MONGO_PASSWORD, MONGO_USER, MONGO_DB } = process.env
 
@@ -21,8 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+app.use(passport.initialize())
+jwtStatregy(passport)
 app.get("/", function(req, res) {
-  res.status(201).json('Done')
+  res.status(201).json("Done")
 })
 
 app.use(Router)
