@@ -6,7 +6,6 @@ import Auth from "./../actions/auth"
 
 export default ({ location }) => {
   const displayError = () => {
-    console.log("ERROR")
     alert("An error occured")
     navigate("/")
   }

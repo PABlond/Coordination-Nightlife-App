@@ -4,10 +4,6 @@ import { FaGithub } from "react-icons/fa"
 import styled from "styled-components"
 
 export default () => {
-  const login = () => {
-    console.log("login")
-  }
-
   return (
     <>
       <a

@@ -47,7 +47,6 @@ export default class Businesses {
     const usersGoing = await User.find({
       "places.id": id
     })
-    console.log(usersGoing)
     return usersGoing.map(({ name, places }: any) => ({
       name,
       when: places
@@ -63,14 +62,10 @@ export default class Businesses {
     const {
       data: { reviews }
     } = await getBusinessReview({ id })
-    console.log(this.formatData({
-      ...data,
-      going: await this.getOnGoingUser({id: data.id}),
-      reviews: this.formatReview(reviews)
-    }))
+
     return this.formatData({
       ...data,
-      going: await this.getOnGoingUser({id: data.id}),
+      going: await this.getOnGoingUser({ id: data.id }),
       reviews: this.formatReview(reviews)
     })
   }

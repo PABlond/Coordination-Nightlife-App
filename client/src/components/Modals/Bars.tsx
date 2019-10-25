@@ -21,7 +21,6 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
         id,
       }
     )
-    console.log(barInfo)
     setData(barInfo)
     setLoading(false)
   }
@@ -32,7 +31,6 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
   }
 
   const placeEvent = async () => {
-    console.log(startDate)
     const month = startDate.getMonth() + 1
     const day = startDate.getDate()
     const year = startDate.getFullYear()

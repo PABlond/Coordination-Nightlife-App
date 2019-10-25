@@ -59,7 +59,6 @@ export default class Auth {
     if (!(await this.isUserExists({ email }))) {
       await this.createUser({ email, name })
     }
-    // console.log(this.isUserExists({ email }))
     const token = this.getToken({ email, name })
     return { token }
   }

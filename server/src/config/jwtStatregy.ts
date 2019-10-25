@@ -10,7 +10,6 @@ const opts = {
   secretOrKey: process.env.JWT_SECRET
 }
 
-console.log(new Auth().getToken("pierre-alexis.blond@live.fr"))
 
 export default (passport: any) =>
   passport.use(

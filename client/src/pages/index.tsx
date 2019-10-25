@@ -29,12 +29,10 @@ export default ({ data, location }) => {
 
   const query = queryString.parse(location.search)
   const onSearch = async () => {
-    console.log(query.location)
     const { data } = await axios.post("http://localhost:3000/api/search", {
       city: query.location,
       offset: (parseInt(query.page as string) - 1) * 12,
     })
-    console.log(data)
     setBars(data)
     setLoading(false)
   }
@@ -51,7 +49,6 @@ export default ({ data, location }) => {
   }
 
   const paginate = (to: string) => {
-    console.log(query.page)
     const page =
       to === "previous"
         ? parseInt(query.page as string) - 1
@@ -77,7 +74,6 @@ export default ({ data, location }) => {
     }
   }, [location])
 
-  // if (bars.length) console.log(bars[0].name)
   return (
     <>
       <Nav />
