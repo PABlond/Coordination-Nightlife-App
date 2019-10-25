@@ -12,8 +12,9 @@ import { Container, Form, Col, Row, Pagination } from "react-bootstrap"
 import { FaArrowAltCircleRight } from "react-icons/fa"
 import Nav from "./../components/Nav"
 import ModalBars from "./../components/Modals/Bars"
+import Img from "gatsby-image"
 
-export default ({ location }) => {
+export default ({ data, location }) => {
   const initialModalData = {
     show: false,
     id: "",
@@ -116,24 +117,35 @@ export default ({ location }) => {
                 name,
                 image_url: photo,
                 is_closed,
-                location: { formatted_address },
+                location: { address1, address2, city },
                 going,
               }: any) => {
                 return (
                   <Col md={3} key={id} onClick={() => openModalBar(id)}>
                     <CardTitle>{name}</CardTitle>
-                    <img className="img-fluid" src={photo} />
-                    <p>
-                      {!is_closed ? (
-                        <span className="text-info">"Open"</span>
-                      ) : (
-                        <span className="text-danger">Closed</span>
-                      )}
-                    </p>
-                    <p
-                      dangerouslySetInnerHTML={{ __html: formatted_address }}
-                    ></p>
-                    <p>{going.length} going</p>
+                    {photo ? (
+                      <img className="img-fluid" src={photo} />
+                    ) : (
+                      <Img {...data.file.childImageSharp} />
+                    )}
+
+                    <DescriptionContainer>
+                      <DescriptionLine>
+                        {!is_closed ? (
+                          <span className="text-info">Open</span>
+                        ) : (
+                          <span className="text-danger">Closed</span>
+                        )}
+                      </DescriptionLine>
+                      <DescriptionLine>
+                        <b>Address</b> : {address1 || address2} {city}
+                      </DescriptionLine>
+                      <DescriptionLine>
+                        {going.length > 0
+                          ? `${going.length} people plan to go there`
+                          : "Nobody plans to go there"}
+                      </DescriptionLine>
+                    </DescriptionContainer>
                   </Col>
                 )
               }
@@ -182,8 +194,40 @@ const FormControl = styled(Form.Control)`
   height: 30px;
   margin-right: 10px;
 `
+const DescriptionContainer = styled.div`
+  margin-bottom: 1rem;
+`
+
+const DescriptionLine = styled.p`
+  margin-bottom: 0 !important;
+`
+
 const CardTitle = styled.h3`
   text-align: center;
 `
 
 const SubmitButton = styled.button``
+
+export const query = graphql`
+  query MyQuery {
+    file(relativePath: { eq: "noImg.png" }) {
+      id
+      childImageSharp {
+        fluid {
+          base64
+          tracedSVG
+          aspectRatio
+          src
+          srcSet
+          srcWebp
+          srcSetWebp
+          sizes
+          originalImg
+          originalName
+          presentationWidth
+          presentationHeight
+        }
+      }
+    }
+  }
+`
