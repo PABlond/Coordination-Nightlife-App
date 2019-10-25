@@ -24,6 +24,26 @@ export default ({ show, handleClose, id }) => {
     handleClose()
   }
 
+  const placeEvent = async () => {
+    console.log(startDate)
+    const month = startDate.getMonth() + 1
+    const day = startDate.getDate()
+    const year = startDate.getFullYear()
+    const date = [year, month, day].join(", ")
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${window.localStorage.getItem("nightlife")}`,
+    }
+    const { data } = await axios.post(
+      "http://localhost:3000/api/rsvp",
+      { id, date },
+      { headers }
+    )
+    close()
+    mainLoading(true)
+    navigate(`/?${queryString.stringify(query)}`)
+  }
+
   useEffect(() => {
     if (show) fetchData()
   }, [show])
