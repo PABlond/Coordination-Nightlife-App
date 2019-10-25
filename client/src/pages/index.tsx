@@ -3,6 +3,7 @@ import styled from "styled-components"
 import axios from "axios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./../assets/scss/style.scss"
+import "react-datepicker/dist/react-datepicker.css"
 import queryString from "query-string"
 import { navigate } from "gatsby"
 
@@ -31,6 +32,7 @@ export default ({ location }) => {
     const { data } = await axios.post("http://localhost:3000/api/search", {
       city: query.location,
     })
+    console.log(data)
     setBars(data)
     setLoading(false)
   }
@@ -94,24 +96,27 @@ export default ({ location }) => {
               ({
                 id,
                 name,
-                photos: [photo],
-                hours: { is_open_now: isOpen },
+                image_url: photo,
+                is_closed,
                 location: { formatted_address },
-              }: any) => {
+                going
+              }: 
+              any) => {
                 return (
                   <Col md={3} key={id} onClick={() => openModalBar(id)}>
                     <CardTitle>{name}</CardTitle>
                     <img className="img-fluid" src={photo} />
                     <p>
-                      {isOpen ? (
-                        <p className="text-info">"Open"</p>
+                      {!is_closed ? (
+                        <span className="text-info">"Open"</span>
                       ) : (
-                        <p className="text-danger">Closed</p>
+                        <span className="text-danger">Closed</span>
                       )}
                     </p>
                     <p
                       dangerouslySetInnerHTML={{ __html: formatted_address }}
                     ></p>
+                    <p>{going.length} going</p>
                   </Col>
                 )
               }
@@ -122,6 +127,8 @@ export default ({ location }) => {
           show={modalData.show}
           handleClose={() => setModalData(initialModalData)}
           id={modalData.id}
+          query={query}
+          mainLoading={setLoading}
         />
       </Content>
     </>
