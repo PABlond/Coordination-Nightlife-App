@@ -18,6 +18,7 @@ describe("Test the /api/search path", () => {
     .send({city})
     expect(response.status).toBe(201)
     expect(response.body[0].location.city).toBe(city)
+    expect(response.body.length).toBe(12)
   })  
 })
 
@@ -28,6 +29,17 @@ describe("Test the /api/business path", () => {
     .post("/api/business")
     .send({id})
     expect(response.status).toBe(201)
-    expect(response.body.id).toBe(id)
+    expect(response.body.name).toBe("Dirty Dick")
   })  
 })
+
+// describe("Test the /api/rsvp path", () => {
+//   test("It should response with an object of buisnness", async () => {
+//     const id = "PX1hwexNzzxd4-2HR-utUg"
+//     const response = await request(app)
+//     .post("/api/business")
+//     .send({id, date: "2019,10,24"})
+//     expect(response.status).toBe(201)
+//     expect(response.body).toBe(true)
+//   })  
+// })
