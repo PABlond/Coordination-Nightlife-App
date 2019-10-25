@@ -13,7 +13,7 @@ export default ({ location }) => {
 
   const fetchCode = async code => {
     const {
-      data: { access_token } = { access_token: "" },
+      data: { token },
       err,
     }: any = await axios
       .post("http://localhost:3000/api/github-cb", {
@@ -22,7 +22,7 @@ export default ({ location }) => {
       .catch(err => ({ err }))
     if (!err) {
       const auth = new Auth()
-      const isTokenStored = auth.setToken(access_token)
+      const isTokenStored = auth.setToken(token)
       if (!isTokenStored) return displayError()
       navigate("/")
     } else displayError()
@@ -30,7 +30,6 @@ export default ({ location }) => {
 
   useEffect(() => {
     const { code } = queryString.parse(location.search)
-    console.log(code)
     fetchCode(code)
   }, [])
 
