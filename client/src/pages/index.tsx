@@ -8,7 +8,7 @@ import queryString from "query-string"
 import { navigate } from "gatsby"
 
 import { H1, H3 } from "./../components/Styled/Headings"
-import { Container, Form, Col, Row } from "react-bootstrap"
+import { Container, Form, Col, Row, Pagination } from "react-bootstrap"
 import { FaArrowAltCircleRight } from "react-icons/fa"
 import Nav from "./../components/Nav"
 import ModalBars from "./../components/Modals/Bars"
@@ -31,6 +31,7 @@ export default ({ location }) => {
     console.log(query.location)
     const { data } = await axios.post("http://localhost:3000/api/search", {
       city: query.location,
+      offset: (parseInt(query.page as string) - 1) * 12,
     })
     console.log(data)
     setBars(data)
@@ -41,11 +42,25 @@ export default ({ location }) => {
     setModalData({ show: true, id })
   }
 
-  const navigateTo = (path, e) => {
+  const navigateTo = (path, e = undefined) => {
     if (e) e.preventDefault()
     navigate(path)
 
     setLoading(true)
+  }
+
+  const paginate = (to: string) => {
+    console.log(query.page)
+    const page =
+      to === "previous"
+        ? parseInt(query.page as string) - 1
+        : parseInt(query.page as string) + 1
+    navigateTo(
+      `/?${queryString.stringify({
+        ...query,
+        page,
+      })}`
+    )
   }
 
   useEffect(() => {
@@ -75,7 +90,10 @@ export default ({ location }) => {
       <Content>
         <CustomForm
           onSubmit={(e: any) =>
-            navigateTo(`/?loading=true&search=true&location=${search}`, e)
+            navigateTo(
+              `/?loading=true&search=true&location=${search}&page=1`,
+              e
+            )
           }
         >
           <FormGroup controlId="formBasicSearch">
@@ -99,9 +117,8 @@ export default ({ location }) => {
                 image_url: photo,
                 is_closed,
                 location: { formatted_address },
-                going
-              }: 
-              any) => {
+                going,
+              }: any) => {
                 return (
                   <Col md={3} key={id} onClick={() => openModalBar(id)}>
                     <CardTitle>{name}</CardTitle>
@@ -121,6 +138,13 @@ export default ({ location }) => {
                 )
               }
             )}
+            <Pagination>
+              {parseInt(query.page as string) > 1 && (
+                <Pagination.Prev onClick={() => paginate("previous")} />
+              )}
+
+              <Pagination.Next onClick={() => paginate("next")} />
+            </Pagination>
           </Row>
         </Container>
         <ModalBars
