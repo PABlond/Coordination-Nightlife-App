@@ -15,6 +15,14 @@ Router.post("/github-cb", async (req, res) => {
   return res.status(response.err ? 401 : 201).json(response)
 })
 
+Router.get(
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    return res.status(201).json(req.user)
+  }
+)
+
 Router.post("/search", async (req, res) => {
   return res.status(201).json(await businesses.getBusinesses(req.body))
 })
