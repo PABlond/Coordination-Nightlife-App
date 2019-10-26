@@ -51,7 +51,6 @@ describe("Test the /api/rsvp path", () => {
 
 describe("Test the /api/user path", () => {
   test("It should response with user object", async () => {
-    const id = "PX1hwexNzzxd4-2HR-utUg"
     const email = 'pierre-alexis.blond@live.fr'
     const bearer = `Bearer ${auth.getToken({email, name: ""})}`
     const response = await request(app)
