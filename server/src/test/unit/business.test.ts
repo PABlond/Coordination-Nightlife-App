@@ -1,7 +1,8 @@
 import Business from "../../controllers/business"
 import mongoose from "mongoose"
-import User from "./../../models/user"
 import dotenv from "dotenv"
+import deletePlaces from "./../helpers/deletePlaces"
+
 const business = new Business()
 
 dotenv.config()
@@ -42,19 +43,11 @@ describe("Test getOnGoingUser", () => {
   })
 })
 
-const deletePlaces = async () => {
-    const email = "pierre-alexis.blond@live.fr"
-  const user = (await User.findOne({ email })) as any
-  user.places = []
-  await user.save()
-}
-
 beforeAll(async () => {
   const { MONGO_PASSWORD, MONGO_USER, MONGO_DB } = process.env
   mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_DB}`, {
     useNewUrlParser: true
   })
-
   await deletePlaces()
 })
 
