@@ -13,6 +13,7 @@ import { FaArrowAltCircleRight } from "react-icons/fa"
 import Nav from "./../components/Nav"
 import ModalBars from "./../components/Modals/Bars"
 import Img from "gatsby-image"
+import Initial from "./../components/Initial"
 
 export default ({ data, location }) => {
   const initialModalData = {
@@ -140,15 +141,17 @@ export default ({ data, location }) => {
                       <DescriptionLine>
                         <b>Phone</b> : {phone}
                       </DescriptionLine>
-                      <DescriptionLine>
+                      <InitialContainer>
                         {going.length > 0 ? (
                           <>
-                            <b>{going.length} people</b> will be there`
+                            {going.map((user: any, i: number) => (
+                              <Initial user={user} key={i} i={i} />
+                            ))}
                           </>
                         ) : (
                           "Nobody is interested"
                         )}
-                      </DescriptionLine>
+                      </InitialContainer>
                     </DescriptionContainer>
                   </Col>
                 )
@@ -208,6 +211,10 @@ const DescriptionLine = styled.p`
 
 const CardTitle = styled.h3`
   text-align: center;
+`
+
+const InitialContainer = styled.div`
+  display: flex;
 `
 
 const SubmitButton = styled.button``

@@ -8,6 +8,7 @@ import Auth from "./../../actions/auth"
 
 import { Container, Row, Col, Modal, Carousel, Button } from "react-bootstrap"
 import DatePicker from "react-datepicker"
+import Initial from "./../Initial"
 
 export default ({ show, handleClose, id, query, mainLoading }) => {
   const [loading, setLoading] = useState<Boolean>(true)
@@ -91,7 +92,9 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
               <DescriptionLine>
                 Address: : {data.address.join(" ") || "No Data"}
               </DescriptionLine>
-              <DescriptionLine>Phone : {data.phone || "No Data"}</DescriptionLine>
+              <DescriptionLine>
+                Phone : {data.phone || "No Data"}
+              </DescriptionLine>
             </DescriptionContainer>
             <DescriptionContainer>
               {new Auth().isLogged() ? (
@@ -115,12 +118,7 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
             </DescriptionContainer>
             <InitialContainer>
               {data.going.map((user: any, i: number) => (
-                <InitialLetter key={i}>
-                  {user.name
-                    .split(" ")
-                    .map(word => word[0])
-                    .join("")}
-                </InitialLetter>
+                <Initial user={user} key={i} i={i} />
               ))}
             </InitialContainer>
             {data.reviews.map((review: any, i: number) => (
@@ -190,14 +188,6 @@ const ReviewContainer = styled(Container)`
 `
 const InitialContainer = styled.div`
   display: flex;
-`
-
-const InitialLetter = styled.p`
-  background-color: ${colors.main};
-  padding: 10px;
-  border-radius: 50%;
-  font-weight: 600;
-  color: #fff;
 `
 
 const ReviewHeader = styled(Row)`
