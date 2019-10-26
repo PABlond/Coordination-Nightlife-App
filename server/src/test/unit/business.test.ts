@@ -36,20 +36,28 @@ describe("Test getOnGoingUser", () => {
   test("It should return an array", async () => {
     const id = "gjwELZmHUNO0WdqXYBEbcg"
     const response = await business.getOnGoingUser({ id })
-    expect(response.length).toBeGreaterThanOrEqual(1)
+    expect(response.length).toBe(1)
+    expect(response[0].when[0]).toBe("2021, 12, 25")
+    expect(response[0].name).toBe("Pierre-Alexis Blond")
   })
 })
+
+const deletePlaces = async () => {
+    const email = "pierre-alexis.blond@live.fr"
+  const user = (await User.findOne({ email })) as any
+  user.places = []
+  await user.save()
+}
 
 beforeAll(async () => {
   const { MONGO_PASSWORD, MONGO_USER, MONGO_DB } = process.env
   mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_DB}`, {
     useNewUrlParser: true
   })
+
+  await deletePlaces()
 })
 
 afterAll(async () => {
-  const email = "pierre-alexis.blond@live.fr"
-  const user = (await User.findOne({ email })) as any
-  user.places = []
-  await user.save()
+  await deletePlaces()
 })
