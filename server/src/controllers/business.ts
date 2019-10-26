@@ -14,11 +14,11 @@ export default class Businesses {
   yelp_token = process.env.YELP_TOKEN
   auth = new Auth()
 
-  formatToday() {
-    var d = new Date(),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear()
+  formatToday = () => {
+    const d = new Date()
+    const year = d.getFullYear()
+    let month = "" + (d.getMonth() + 1)
+    let day = "" + d.getDate()
 
     if (month.length < 2) month = "0" + month
     if (day.length < 2) day = "0" + day
@@ -41,20 +41,6 @@ export default class Businesses {
       business.going = await this.getOnGoingUser({ id: business.id })
     }
     return businesses
-  }
-
-  getOnGoingUser = async ({ id }: { id: string }) => {
-    const usersGoing = await User.find({
-      "places.id": id
-    })
-    return usersGoing.map(({ name, places }: any) => ({
-      name,
-      when: places
-        .map(({ id: businessId, when }: IPlace) =>
-          id === businessId ? when : null
-        )
-        .filter(Boolean)
-    }))
   }
 
   getBusiness = async ({ id }: any) => {
@@ -86,6 +72,20 @@ export default class Businesses {
       await user.save()
     }
     return !!user
+  }
+
+  getOnGoingUser = async ({ id }: { id: string }) => {
+    const usersGoing = await User.find({
+      "places.id": id
+    })
+    return usersGoing.map(({ name, places }: any) => ({
+      name,
+      when: places
+        .map(({ id: businessId, when }: IPlace) =>
+          id === businessId ? when : null
+        )
+        .filter(Boolean)
+    }))
   }
 
   formatReview = (reviews: ReqReview[]) =>

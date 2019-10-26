@@ -22,16 +22,15 @@ describe("Test getBusiness", () => {
   })
 })
 
-
 describe("Test placeEvent", () => {
-    test("It should return an array", async () => {
-      const id = "gjwELZmHUNO0WdqXYBEbcg"
-      const date = '2021, 12, 25'
-      const email = "pierre-alexis.blond@live.fr"
-      const response = await business.placeEvent({ id, date, email })
-      expect(response).toBe(true)
-    })
+  test("It should return an array", async () => {
+    const id = "gjwELZmHUNO0WdqXYBEbcg"
+    const date = "2021, 12, 25"
+    const email = "pierre-alexis.blond@live.fr"
+    const response = await business.placeEvent({ id, date, email })
+    expect(response).toBe(true)
   })
+})
 
 describe("Test getOnGoingUser", () => {
   test("It should return an array", async () => {
@@ -46,4 +45,11 @@ beforeAll(async () => {
   mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_DB}`, {
     useNewUrlParser: true
   })
+})
+
+afterAll(async () => {
+  const email = "pierre-alexis.blond@live.fr"
+  const user = (await User.findOne({ email })) as any
+  user.places = []
+  await user.save()
 })
