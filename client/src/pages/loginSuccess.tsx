@@ -1,36 +1,38 @@
 import React, { useEffect } from "react"
 import queryString from "query-string"
 import { navigate } from "gatsby"
-import axios from "axios"
 import Auth from "./../actions/auth"
+import { githubLogin } from "./../actions/queries"
 
-export default ({ location }) => {
+import { Spinner } from "react-bootstrap"
+
+export default ({ location }: { location: string }) => {
   const displayError = () => {
     alert("An error occured")
     navigate("/")
   }
 
-  const fetchCode = async code => {
-    const {
-      data: { token },
-      err,
-    }: any = await axios
-      .post("http://localhost:3000/api/github-cb", {
-        code,
-      })
-      .catch(err => ({ err }))
+  const fetchCode = async (code: string) => {
+    const { data = { token: "" }, err } = (await githubLogin(code)) as {
+      data?: { token: string }
+      err?: any
+    }
     if (!err) {
-      const auth = new Auth()
-      const isTokenStored = auth.setToken(token)
+      const { token } = data
+      const isTokenStored = new Auth().setToken(token)
       if (!isTokenStored) return displayError()
       navigate("/")
     } else displayError()
   }
 
   useEffect(() => {
-    const { code } = queryString.parse(location.search)
-    fetchCode(code)
+    const { code } = queryString.parse(location.search as any)
+    fetchCode(code as string)
   }, [])
 
-  return <p>login ...</p>
+  return (
+    <Spinner animation="border" role="status">
+      <span className="sr-only">Loading...</span>
+    </Spinner>
+  )
 }
