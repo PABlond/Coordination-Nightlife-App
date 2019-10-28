@@ -1,4 +1,4 @@
-const api_url = "http://localhost:3000/api"
+const api_url = "https://pablond-coordination-nightlife-app.glitch.me/api"
 
 export const routes = {
   getBusiness: `${api_url}/business`,

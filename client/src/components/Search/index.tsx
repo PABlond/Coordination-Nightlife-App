@@ -28,7 +28,7 @@ export default ({
         />
       </FormGroup>
       <SubmitButton type="submit">
-        <FaArrowAltCircleRight />
+        <FaArrowAltCircleRight size="2em" />
       </SubmitButton>
     </CustomForm>
   )
@@ -37,9 +37,11 @@ export default ({
 const CustomForm = styled(Form)`
   display: flex;
   justify-content: center;
+  margin-bottom: 2rem;
 `
 
 const FormGroup = styled(Form.Group)`
+  margin-bottom: 0 !important;
   justify-content: space-around;
   display: flex;
   width: 50%;
@@ -50,4 +52,7 @@ const FormControl = styled(Form.Control)`
   margin-right: 10px;
 `
 
-const SubmitButton = styled.button``
+const SubmitButton = styled.button`
+  background-color: #fff;
+  border: none;
+`
