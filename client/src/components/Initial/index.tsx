@@ -2,9 +2,9 @@ import React from "react"
 import styled from "styled-components"
 import colors from "./../../config/colors"
 
-import { Overlay, OverlayTrigger, Tooltip } from "react-bootstrap"
+import { OverlayTrigger, Tooltip } from "react-bootstrap"
 
-export default ({ user, i }: any) => {
+export default ({ user }: { user: { name: string; when: string } }) => {
   return (
     <>
       <OverlayTrigger
@@ -19,7 +19,7 @@ export default ({ user, i }: any) => {
         <InitialLetter>
           {user.name
             .split(" ")
-            .map(word => word[0])
+            .map((word: string) => word[0])
             .join("")}
         </InitialLetter>
       </OverlayTrigger>

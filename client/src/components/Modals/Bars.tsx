@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from "react"
-import axios from "axios"
 import styled from "styled-components"
 import { navigate } from "gatsby"
 import queryString from "query-string"
 import colors from "./../../config/colors"
+import { IModalData } from "./../../interfaces/modal.interface"
+import { getBusiness, placeEvent } from "./../../actions/queries"
 import Auth from "./../../actions/auth"
 
-import { Container, Row, Col, Modal, Carousel, Button } from "react-bootstrap"
+import { Modal, Carousel, Button } from "react-bootstrap"
 import DatePicker from "react-datepicker"
 import Initial from "./../Initial"
+import Comments from "./../Comments"
 
-export default ({ show, handleClose, id, query, mainLoading }) => {
+export default ({
+  show,
+  handleClose,
+  id,
+  query,
+  mainLoading,
+}: {
+  show: boolean | undefined
+  handleClose: () => void
+  id: string
+  query: any
+  mainLoading: (bool: Boolean) => void
+}) => {
   const [loading, setLoading] = useState<Boolean>(true)
-  const [data, setData] = useState({})
-  const [startDate, setStartDate] = useState(null)
+  const [data, setData] = useState<IModalData | {}>({})
+  const [startDate, setStartDate] = useState<Date | null>(null)
 
   const fetchData = async () => {
-    const { data: barInfo } = await axios.post(
-      "http://localhost:3000/api/business",
-      {
-        id,
-      }
-    )
+    const barInfo = await getBusiness(id)
     setData(barInfo)
     setLoading(false)
   }
@@ -31,58 +40,63 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
     handleClose()
   }
 
-  const placeEvent = async () => {
-    const month = startDate.getMonth() + 1
-    const day = startDate.getDate()
-    const year = startDate.getFullYear()
-    const date = [year, month, day].join(", ")
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${window.localStorage.getItem("nightlife")}`,
+  const handlePlaceEvent = async () => {
+    if (startDate) {
+      const month = startDate.getMonth() + 1
+      const day = startDate.getDate()
+      const year = startDate.getFullYear()
+      const date = [year, month, day].join(", ")
+      await placeEvent(id, date)
+      close()
+      mainLoading(true)
+      navigate(`/?${queryString.stringify(query)}`)
     }
-    const { data } = await axios.post(
-      "http://localhost:3000/api/rsvp",
-      { id, date },
-      { headers }
-    )
-    close()
-    mainLoading(true)
-    navigate(`/?${queryString.stringify(query)}`)
   }
 
   useEffect(() => {
     if (show) fetchData()
   }, [show])
 
+  const {
+    rating = 0,
+    name = "",
+    photos = [],
+    going = [],
+    is_closed = false,
+    address = [""],
+    phone = "",
+    reviews = [],
+  } = data as IModalData
+
   return (
     <Modal show={show} onHide={close} animation={false}>
-      {loading ? (
+      {loading && Object.keys(data).length ? (
         <Modal.Body>Loading ... </Modal.Body>
       ) : (
         <>
           <Modal.Header closeButton>
             <ModalTitle>
-              {data.name}{" "}
-              {data.rating &&
-                Array.from(Array(Math.floor(data.rating)).keys()).map(i => (
+              {name}{" "}
+              {rating &&
+                Array.from(Array(Math.floor(rating)).keys()).map(i => (
                   <span key={i}>*</span>
                 ))}
             </ModalTitle>
           </Modal.Header>
           <Modal.Body>
             <Carousel>
-              {data.photos.map((photo: string, i: number) => (
+              {photos.map((photo: string, i: number) => (
                 <Carousel.Item key={i}>
                   <ImgBusiness
                     className="img-fluid"
                     src={photo}
-                    alt={data.name + i}
+                    alt={name + i}
                   />
                 </Carousel.Item>
               ))}
             </Carousel>
             <DescriptionContainer>
-              {!data.is_closed ? (
+              {!is_closed ? (
                 <DescriptionLine className="text-info">Open</DescriptionLine>
               ) : (
                 <DescriptionLine className="text-danger">
@@ -90,11 +104,9 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
                 </DescriptionLine>
               )}
               <DescriptionLine>
-                Address: : {data.address.join(" ") || "No Data"}
+                Address: : {address.join(" ") || "No Data"}
               </DescriptionLine>
-              <DescriptionLine>
-                Phone : {data.phone || "No Data"}
-              </DescriptionLine>
+              <DescriptionLine>Phone : {phone || "No Data"}</DescriptionLine>
             </DescriptionContainer>
             <DescriptionContainer>
               {new Auth().isLogged() ? (
@@ -102,11 +114,11 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
                   {" "}
                   <DatePicker
                     selected={startDate}
-                    onChange={date => setStartDate(date)}
+                    onChange={(date: Date) => setStartDate(date)}
                     minDate={new Date()}
                     placeholderText="Select a date"
                   />
-                  <Button variant="primary" onClick={placeEvent}>
+                  <Button variant="primary" onClick={handlePlaceEvent}>
                     I'll go there
                   </Button>
                 </>
@@ -117,36 +129,11 @@ export default ({ show, handleClose, id, query, mainLoading }) => {
               )}
             </DescriptionContainer>
             <InitialContainer>
-              {data.going.map((user: any, i: number) => (
-                <Initial user={user} key={i} i={i} />
+              {going.map((user: any, i: number) => (
+                <Initial user={user} key={i} />
               ))}
             </InitialContainer>
-            {data.reviews.map((review: any, i: number) => (
-              <ReviewContainer key={i}>
-                <ReviewHeader>
-                  <Col md={4}>
-                    <UserImgReview
-                      className="img-fluid"
-                      src={review.image_url}
-                    />
-                  </Col>
-                  <Col md={8}>
-                    <PMargin0>
-                      {review.name}{" "}
-                      {Array.from(Array(Math.floor(review.rating)).keys()).map(
-                        i => (
-                          <span key={i}>*</span>
-                        )
-                      )}
-                    </PMargin0>
-
-                    <PMargin0>{review.time_created}</PMargin0>
-                  </Col>
-                </ReviewHeader>
-
-                <p>{review.text}</p>
-              </ReviewContainer>
-            ))}
+            <Comments reviews={reviews} />
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={close}>
@@ -177,24 +164,6 @@ const ImgBusiness = styled.img`
   height: 500px;
 `
 
-const UserImgReview = styled.img`
-  max-height: 70px;
-`
-
-const ReviewContainer = styled(Container)`
-  border: 1px solid black;
-  padding: 1rem;
-  margin-bottom: 2rem;
-`
 const InitialContainer = styled.div`
   display: flex;
-`
-
-const ReviewHeader = styled(Row)`
-  align-items: center;
-  margin-bottom: 1rem;
-`
-
-const PMargin0 = styled.p`
-  margin-bottom: 0 !important;
 `

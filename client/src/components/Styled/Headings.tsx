@@ -1,8 +1,7 @@
-import React from "react"
 import styled from "styled-components"
 import colors from "./../../config/colors"
 
-const { main: mainColor, dark: darkColor, light: lightColor } = colors
+const { main: mainColor, dark: darkColor } = colors
 
 export const H1 = styled.h1`
   color: ${mainColor};
